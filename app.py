@@ -5,10 +5,13 @@ Provides REST API endpoints for logging workouts and getting AI-powered suggesti
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Optional, List, Dict
 from datetime import datetime
 import uvicorn
+import os
 
 from db import init_database, log_workout, get_recent_workouts, get_all_workouts
 from llm import get_workout_suggestion
@@ -60,21 +63,47 @@ class SuggestionResponse(BaseModel):
     generated_at: str
     workout_history_count: int
 
+# Mount static files for frontend
+if os.path.exists("frontend"):
+    app.mount("/static", StaticFiles(directory="frontend"), name="static")
+
 # Initialize database on startup
 @app.on_event("startup")
 async def startup_event():
     """Initialize the database when the app starts."""
     init_database()
 
-# Health check endpoint
+# Serve frontend
 @app.get("/")
-async def root():
-    """Root endpoint for health check."""
-    return {
-        "message": "LLM-Powered Workout Tracker API",
-        "status": "healthy",
-        "version": "1.0.0"
-    }
+async def serve_frontend():
+    """Serve the frontend application."""
+    if os.path.exists("frontend/index.html"):
+        return FileResponse("frontend/index.html")
+    else:
+        return {
+            "message": "LLM-Powered Workout Tracker API",
+            "status": "healthy",
+            "version": "1.0.0",
+            "note": "Frontend not found. Please ensure frontend files are in the 'frontend' directory."
+        }
+
+# Serve CSS file
+@app.get("/styles.css")
+async def serve_css():
+    """Serve the CSS file."""
+    if os.path.exists("frontend/styles.css"):
+        return FileResponse("frontend/styles.css", media_type="text/css")
+    else:
+        raise HTTPException(status_code=404, detail="CSS file not found")
+
+# Serve JavaScript file
+@app.get("/script.js")
+async def serve_js():
+    """Serve the JavaScript file."""
+    if os.path.exists("frontend/script.js"):
+        return FileResponse("frontend/script.js", media_type="application/javascript")
+    else:
+        raise HTTPException(status_code=404, detail="JavaScript file not found")
 
 # Health check endpoint
 @app.get("/health")
