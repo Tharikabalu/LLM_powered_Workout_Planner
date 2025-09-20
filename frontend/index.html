@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM-Powered Workout Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-dumbbell"></i>
+                    <h1>Workout Tracker</h1>
+                </div>
+                <nav class="nav">
+                    <button class="nav-btn active" data-section="dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        Dashboard
+                    </button>
+                    <button class="nav-btn" data-section="log-workout">
+                        <i class="fas fa-plus"></i>
+                        Log Workout
+                    </button>
+                    <button class="nav-btn" data-section="history">
+                        <i class="fas fa-history"></i>
+                        History
+                    </button>
+                    <button class="nav-btn" data-section="suggestions">
+                        <i class="fas fa-robot"></i>
+                        AI Suggestions
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h2>Dashboard</h2>
+                    <p>Your workout overview and statistics</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-workouts">0</h3>
+                            <p>Total Workouts</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="unique-exercises">0</h3>
+                            <p>Unique Exercises</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-duration">0</h3>
+                            <p>Total Minutes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="last-workout">-</h3>
+                            <p>Last Workout</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-workouts">
+                    <h3>Recent Workouts</h3>
+                    <div id="recent-workouts-list" class="workout-list">
+                        <!-- Recent workouts will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Log Workout Section -->
+            <section id="log-workout" class="section">
+                <div class="section-header">
+                    <h2>Log New Workout</h2>
+                    <p>Record your exercise session</p>
+                </div>
+                
+                <div class="form-container">
+                    <form id="workout-form" class="workout-form">
+                        <div class="form-group">
+                            <label for="exercise-name">Exercise Name *</label>
+                            <input type="text" id="exercise-name" name="exercise_name" required 
+                                   placeholder="e.g., Bench Press, Squats, Running">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sets">Sets</label>
+                                <input type="number" id="sets" name="sets" min="1" 
+                                       placeholder="3">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reps">Reps</label>
+                                <input type="number" id="reps" name="reps" min="1" 
+                                       placeholder="10">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="weight">Weight (kg/lbs)</label>
+                                <input type="number" id="weight" name="weight" min="0" step="0.1" 
+                                       placeholder="135.0">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="duration">Duration (minutes)</label>
+                                <input type="number" id="duration" name="duration" min="1" 
+                                       placeholder="30">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" name="date">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Log Workout
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history" class="section">
+                <div class="section-header">
+                    <h2>Workout History</h2>
+                    <p>View all your logged workouts</p>
+                </div>
+                
+                <div class="history-controls">
+                    <button id="load-all-workouts" class="btn btn-secondary">
+                        <i class="fas fa-refresh"></i>
+                        Load All Workouts
+                    </button>
+                </div>
+                
+                <div id="workout-history" class="workout-list">
+                    <!-- Workout history will be loaded here -->
+                </div>
+            </section>
+
+            <!-- AI Suggestions Section -->
+            <section id="suggestions" class="section">
+                <div class="section-header">
+                    <h2>AI Workout Suggestions</h2>
+                    <p>Get personalized workout recommendations</p>
+                </div>
+                
+                <div class="suggestion-form">
+                    <div class="form-group">
+                        <label for="fitness-goal">Fitness Goal</label>
+                        <select id="fitness-goal" name="fitness_goal" required>
+                            <option value="">Select your goal</option>
+                            <option value="strength building">Strength Building</option>
+                            <option value="endurance">Endurance/Cardio</option>
+                            <option value="fat loss">Fat Loss</option>
+                            <option value="muscle building">Muscle Building</option>
+                            <option value="general fitness">General Fitness</option>
+                        </select>
+                    </div>
+                    
+                    <button id="get-suggestion" class="btn btn-primary">
+                        <i class="fas fa-robot"></i>
+                        Get AI Suggestion
+                    </button>
+                </div>
+                
+                <div id="suggestion-result" class="suggestion-result">
+                    <!-- AI suggestions will be displayed here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
