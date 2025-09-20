@@ -5,10 +5,9 @@ Handles LLM chain creation and workout suggestion logic.
 
 import os
 from typing import List, Dict
-from langchain.chains import LLMChain
-from langchain_openai import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
+import langchain
 
 from prompts import get_workout_prompt, WORKOUT_PLANNING_SYSTEM_PROMPT
 from db import get_recent_workouts
@@ -16,12 +15,13 @@ from db import get_recent_workouts
 # Load environment variables
 load_dotenv()
 
+
 class WorkoutSuggestionChain:
     """
     LangChain-based workout suggestion generator.
     """
     
-    def __init__(self, model_name: str = "gpt-3.5-turbo", temperature: float = 0.7):
+    def __init__(self, model_name: str = "gemini-2.5-pro", temperature: float = 0.7):
         """
         Initialize the workout suggestion chain.
         
@@ -29,10 +29,10 @@ class WorkoutSuggestionChain:
             model_name: OpenAI model to use
             temperature: Temperature for response generation
         """
-        self.llm = ChatOpenAI(
-            model_name=model_name,
+        self.llm = ChatGoogleGenerativeAI(
+            model=model_name,
             temperature=temperature,
-            openai_api_key=os.getenv("OPENAI_API_KEY")
+            google_api_key=os.getenv("GOOGLE_API_KEY")
         )
         self.model_name = model_name
         self.temperature = temperature
@@ -92,7 +92,7 @@ class WorkoutSuggestionChain:
             prompt_template = get_workout_prompt(fitness_goal)
             
             # Create the chain
-            chain = LLMChain(llm=self.llm, prompt=prompt_template)
+            llm=self.llm
             
             # Prepare input variables
             input_vars = {
@@ -102,10 +102,11 @@ class WorkoutSuggestionChain:
                 "current_date": current_date
             }
             
+            chain = prompt_template | llm
             # Generate the suggestion
-            response = chain.run(**input_vars)
+            response = chain.invoke(input_vars)
             
-            return response
+            return response.content
             
         except Exception as e:
             error_msg = f"Error generating workout suggestion: {str(e)}"
@@ -137,7 +138,7 @@ class WorkoutSuggestionChain:
             prompt_template = get_workout_prompt(fitness_goal)
             
             # Create the chain
-            chain = LLMChain(llm=self.llm, prompt=prompt_template)
+            llm=self.llm
             
             # Prepare input variables
             input_vars = {
@@ -148,9 +149,9 @@ class WorkoutSuggestionChain:
             }
             
             # Generate the suggestion
-            response = chain.run(**input_vars)
+            response = llm.invoke(prompt_template, input_vars)
             
-            return response
+            return response.content
             
         except Exception as e:
             error_msg = f"Error generating workout suggestion: {str(e)}"
